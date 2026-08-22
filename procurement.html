@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STRATIQ — Procurement & Freight Deliveries</title>
+  <meta name="description" content="Inbound Purchase Orders & Global Freight Tracking" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="public/css/styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[var(--bg-canvas)] text-[var(--text-primary)] antialiased selection:bg-amber-500/20 selection:text-amber-200">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="stratiq-sidebar" class="w-64 shrink-0 hidden lg:block h-full"></aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+      <!-- Navbar -->
+      <div id="stratiq-navbar" class="shrink-0"></div>
+
+      <!-- Page Scrollable View -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono uppercase text-sky-400 font-bold">FREIGHT & SUPPLY CHAINS</span>
+              <span class="text-[var(--text-metadata)]">•</span>
+              <span class="text-xs font-mono text-[var(--text-metadata)]">INBOUND LOGISTICS CARRIERS</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-[var(--text-primary)] font-editorial tracking-tight">
+              Procurement & Freight Deliveries
+            </h1>
+          </div>
+
+          <button
+            onclick="window.store.triggerSupplierDelaySimulation(); showToast('Simulated Disruption: DHL 48H Delay Triggered!', 'warning');"
+            class="px-4 py-2.5 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 font-bold text-xs flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <i data-lucide="zap" class="w-4 h-4 text-rose-500"></i>
+            <span>Simulate Supplier Freight Delay</span>
+          </button>
+        </div>
+
+        <!-- Inbound Shipments Section -->
+        <div class="spotlight-card rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
+            <div>
+              <h3 class="text-sm font-bold text-[var(--text-primary)] font-editorial">Active Inbound Purchase Orders & Deliveries</h3>
+              <p class="text-xs text-[var(--text-muted)]">Carrier telematics & estimated time of arrival (ETA)</p>
+            </div>
+          </div>
+
+          <div id="deliveries-list" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Approved Suppliers Directory -->
+        <div class="spotlight-card rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
+            <div>
+              <h3 class="text-sm font-bold text-[var(--text-primary)] font-editorial">Approved Global Supplier Directory</h3>
+              <p class="text-xs text-[var(--text-muted)]">Vendor performance metrics, lead times, and SLA compliance</p>
+            </div>
+          </div>
+
+          <div id="suppliers-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="public/js/seed.js"></script>
+  <script src="public/js/store.js"></script>
+  <script src="public/js/components.js"></script>
+  <script>
+    function renderProcurementPage() {
+      renderSharedLayout('procurement');
+
+      const deliveries = window.store.getDeliveries();
+      const suppliers = window.store.getSuppliers();
+
+      // Render Deliveries
+      const delList = document.getElementById('deliveries-list');
+      delList.innerHTML = deliveries.map(del => {
+        const isDelayed = del.delay_hours > 0 || del.status === 'CUSTOMS_HOLD';
+        return `
+          <div class="p-5 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] ${isDelayed ? 'border-rose-500/40 bg-rose-950/10' : ''} space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 rounded-xl ${isDelayed ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">
+                  <i data-lucide="truck" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-[var(--text-primary)]">${del.carrier_name}</div>
+                  <div class="text-[10px] font-mono text-[var(--text-metadata)]">Tracking: ${del.tracking_number}</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                  isDelayed ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                }">
+                  ${del.status.replace('_', ' ')} ${isDelayed ? '(+' + del.delay_hours + 'H)' : ''}
+                </span>
+                <span class="text-xs font-mono text-amber-500 font-bold">
+                  ₹${((del.purchase_order?.total_amount || 0) / 100000).toFixed(2)}L
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs border-t border-[var(--border-hairline)] text-[var(--text-muted)]">
+              <div>
+                <span class="text-[10px] font-mono uppercase text-[var(--text-metadata)] block">Origin Depot:</span>
+                <span class="font-medium text-[var(--text-primary)]">${del.origin}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono uppercase text-[var(--text-metadata)] block">Destination Hub:</span>
+                <span class="font-medium text-[var(--text-primary)]">${del.destination}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Suppliers
+      const supGrid = document.getElementById('suppliers-grid');
+      supGrid.innerHTML = suppliers.map(sup => {
+        const isAtRisk = sup.status === 'AT_RISK';
+        return `
+          <div class="p-5 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-3 ${isAtRisk ? 'border-amber-500/40' : ''}">
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="text-sm font-bold text-[var(--text-primary)] font-editorial">${sup.name}</h4>
+                <div class="text-[11px] text-[var(--text-metadata)]">${sup.contact_name}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                isAtRisk ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+              }">
+                ${sup.status.replace('_', ' ')}
+              </span>
+            </div>
+
+            <div class="space-y-1 text-xs text-[var(--text-muted)] pt-1">
+              <div class="flex justify-between font-mono text-[11px]">
+                <span class="text-[var(--text-metadata)]">Lead Time:</span>
+                <span class="font-bold text-[var(--text-primary)]">${sup.lead_time_days} Days</span>
+              </div>
+              <div class="flex justify-between font-mono text-[11px]">
+                <span class="text-[var(--text-metadata)]">SLA Rating:</span>
+                <span class="font-bold text-amber-400">${sup.rating} / 5.0 ★</span>
+              </div>
+              <div class="text-[10px] font-mono text-[var(--text-metadata)] truncate pt-1 border-t border-[var(--border-hairline)]">
+                ${sup.email} • ${sup.phone}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProcurementPage();
+      window.store.subscribe(() => renderProcurementPage());
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+    "name": "STRATIQ Enterprise Operations OS",
+    "description": "Multi-page enterprise operations command center built with HTML5, CSS3, and JavaScript, featuring cross-page persistent reactive store, interactive root-cause topology graphs, automated SLA & revenue-at-risk analysis, and multi-depot stock transfers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

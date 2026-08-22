@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STRATIQ — Immutable Audit Trail & Ledger</title>
+  <meta name="description" content="Immutable Compliance Audit Trail & Operational State Delta Ledger" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="public/css/styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[var(--bg-canvas)] text-[var(--text-primary)] antialiased selection:bg-amber-500/20 selection:text-amber-200">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="stratiq-sidebar" class="w-64 shrink-0 hidden lg:block h-full"></aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+      <!-- Navbar -->
+      <div id="stratiq-navbar" class="shrink-0"></div>
+
+      <!-- Page Scrollable View -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono uppercase text-amber-500 font-bold">COMPLIANCE & GOVERNANCE</span>
+              <span class="text-[var(--text-metadata)]">•</span>
+              <span class="text-xs font-mono text-[var(--text-metadata)]">APPEND-ONLY AUDIT STREAM</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-[var(--text-primary)] font-editorial tracking-tight">
+              Audit Trail & Compliance Ledger
+            </h1>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="spotlight-card p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="audit-filters">
+            <button data-type="ALL" class="audit-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 cursor-pointer">All Events</button>
+            <button data-type="INVENTORY" class="audit-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer">Inventory</button>
+            <button data-type="INCIDENT" class="audit-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer">Incidents</button>
+            <button data-type="APPROVAL" class="audit-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer">Approvals</button>
+          </div>
+
+          <div class="relative w-full sm:w-64">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--text-metadata)] absolute left-3 top-2.5"></i>
+            <input
+              id="audit-search"
+              type="text"
+              placeholder="Search audit actions, users..."
+              class="w-full bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[var(--text-primary)] placeholder-[var(--text-metadata)] focus:outline-none focus:border-amber-500"
+            />
+          </div>
+        </div>
+
+        <!-- Audit Log Stream -->
+        <div class="spotlight-card rounded-3xl p-6 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
+            <div>
+              <h3 class="text-sm font-bold text-[var(--text-primary)] font-editorial">Cryptographically Verified Mutation Stream</h3>
+              <p class="text-xs text-[var(--text-muted)]">State differentials captured on every operational transaction</p>
+            </div>
+          </div>
+
+          <div id="audit-logs-list" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="public/js/seed.js"></script>
+  <script src="public/js/store.js"></script>
+  <script src="public/js/components.js"></script>
+  <script>
+    let filterType = 'ALL';
+    let searchQuery = '';
+
+    function renderAuditPage() {
+      renderSharedLayout('audit');
+
+      const logs = window.store.getAuditLogs();
+      const filtered = logs.filter(log => {
+        if (filterType !== 'ALL' && log.entity_type !== filterType) return false;
+        if (searchQuery) {
+          const mAction = log.action.toLowerCase().includes(searchQuery);
+          const mUser = log.user?.full_name?.toLowerCase().includes(searchQuery);
+          const mEntity = log.entity_id.toLowerCase().includes(searchQuery);
+          return mAction || mUser || mEntity;
+        }
+        return true;
+      });
+
+      const list = document.getElementById('audit-logs-list');
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="p-8 text-center text-xs text-[var(--text-muted)]">No audit entries found.</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(log => {
+        const hasDiff = log.previous_state || log.new_state;
+        const diffId = 'diff-' + log.id.replace(/[^a-zA-Z0-9]/g, '-');
+        return `
+          <div class="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  ${log.action}
+                </span>
+                <span class="text-xs font-mono text-[var(--text-metadata)]">${log.entity_type} • ${log.entity_id}</span>
+              </div>
+
+              <div class="text-xs font-mono text-[var(--text-metadata)]">
+                ${new Date(log.created_at).toLocaleDateString()} ${new Date(log.created_at).toLocaleTimeString()}
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-[var(--text-muted)] pt-1">
+              <div>
+                Triggered by: <span class="font-bold text-[var(--text-primary)]">${log.user?.full_name || 'Automated Telemetry Service'}</span>
+              </div>
+
+              ${hasDiff ? `
+                <button
+                  onclick="document.getElementById('${diffId}').classList.toggle('hidden')"
+                  class="text-[11px] font-mono text-amber-500 hover:text-amber-400 font-semibold cursor-pointer"
+                >
+                  Toggle JSON Diff
+                </button>
+              ` : ''}
+            </div>
+
+            ${hasDiff ? `
+              <div id="${diffId}" class="hidden mt-2 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[10px] font-mono overflow-x-auto space-y-2">
+                ${log.previous_state ? `
+                  <div>
+                    <span class="text-rose-400 font-bold block">Previous State:</span>
+                    <pre class="text-[var(--text-metadata)]">${JSON.stringify(log.previous_state, null, 2)}</pre>
+                  </div>
+                ` : ''}
+                ${log.new_state ? `
+                  <div>
+                    <span class="text-emerald-400 font-bold block">New State:</span>
+                    <pre class="text-[var(--text-primary)]">${JSON.stringify(log.new_state, null, 2)}</pre>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAuditPage();
+      window.store.subscribe(() => renderAuditPage());
+
+      document.querySelectorAll('.audit-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.audit-tab').forEach(t => {
+            t.className = 'audit-tab px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer';
+          });
+          tab.className = 'audit-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 cursor-pointer';
+          filterType = tab.dataset.type;
+          renderAuditPage();
+        });
+      });
+
+      document.getElementById('audit-search').addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderAuditPage();
+      });
+    });
+  </script>
+</body>
+</html>
