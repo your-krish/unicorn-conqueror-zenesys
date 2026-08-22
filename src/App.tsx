@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { RealtimeProvider } from './context/RealtimeContext';
+import { AiAnalyticsProvider } from './context/AiAnalyticsContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar, TabType } from './components/layout/Sidebar';
 import { ExecutiveDashboard } from './components/dashboard/ExecutiveDashboard';
+import { AiAnalyticsCenter } from './components/ai/AiAnalyticsCenter';
 import { IncidentCommandCenter } from './components/incidents/IncidentCommandCenter';
 import { IncidentDetailModal } from './components/incidents/IncidentDetailModal';
 import { InventoryManagement } from './components/inventory/InventoryManagement';
@@ -91,6 +93,10 @@ function MainApp() {
               onOpenTransferModal={() => setIsTransferModalOpen(true)}
               onNavigateTab={(tab) => setCurrentTab(tab as TabType)}
             />
+          )}
+
+          {currentTab === 'ai-analytics' && (
+            <AiAnalyticsCenter />
           )}
 
           {currentTab === 'incidents' && (
@@ -185,7 +191,9 @@ export function App() {
     <ThemeProvider>
       <AuthProvider>
         <RealtimeProvider>
-          <RootApp />
+          <AiAnalyticsProvider>
+            <RootApp />
+          </AiAnalyticsProvider>
         </RealtimeProvider>
       </AuthProvider>
     </ThemeProvider>

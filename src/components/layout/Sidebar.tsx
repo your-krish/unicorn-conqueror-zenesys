@@ -1,13 +1,15 @@
 import React from 'react';
 import { 
   LayoutDashboard, AlertOctagon, Boxes, Truck, CheckSquare, 
-  Users, BarChart3, History, Sliders, ArrowLeftRight, ChevronRight
+  Users, BarChart3, History, Sliders, ArrowLeftRight, ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtime } from '../../context/RealtimeContext';
 
 export type TabType = 
   | 'overview'
+  | 'ai-analytics'
   | 'incidents'
   | 'inventory'
   | 'procurement'
@@ -38,10 +40,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     id: TabType;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
-    badge?: number;
+    badge?: number | string;
     badgeColor?: string;
   }> = [
     { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
+    { 
+      id: 'ai-analytics', 
+      label: 'AI Intelligence Suite', 
+      icon: Sparkles,
+      badge: 'AI',
+      badgeColor: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30',
+    },
     { 
       id: 'incidents', 
       label: 'Critical Incidents', 
