@@ -1,0 +1,6 @@
+{
+  "name": "STRATIQ Enterprise Operations OS",
+  "description": "Enterprise operations command-center powered by Supabase with real-time relational workflows, incident dependency graphs, automated SLA & revenue-at-risk analysis, and role-based operational governance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
