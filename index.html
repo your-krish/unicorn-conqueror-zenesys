@@ -1,36 +1,286 @@
 <!doctype html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>STRATIQ — Enterprise Operations OS</title>
-    <meta name="description" content="Connected Realtime Command Center for Enterprise Operations" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script>
-      // Safe fetch descriptor shim to prevent "Cannot set property fetch of #<Window> which has only a getter"
-      (function() {
-        try {
-          var originalFetch = typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : null;
-          var activeFetch = originalFetch;
-          if (originalFetch) {
-            Object.defineProperty(window, 'fetch', {
-              get: function() { return activeFetch || originalFetch; },
-              set: function(newFetch) { activeFetch = newFetch; },
-              configurable: true,
-              enumerable: true
-            });
-          }
-        } catch (e) {
-          console.warn('Window fetch shim initialization notice:', e);
-        }
-      })();
-    </script>
-  </head>
-  <body class="bg-neutral-950 text-neutral-100 antialiased selection:bg-amber-500/20 selection:text-amber-200 overflow-x-hidden">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STRATIQ — Executive Operations Dashboard</title>
+  <meta name="description" content="Connected Realtime Command Center for Enterprise Operations" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="public/css/styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[var(--bg-canvas)] text-[var(--text-primary)] antialiased selection:bg-amber-500/20 selection:text-amber-200">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="stratiq-sidebar" class="w-64 shrink-0 hidden lg:block h-full"></aside>
 
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+      <!-- Navbar -->
+      <div id="stratiq-navbar" class="shrink-0"></div>
+
+      <!-- Page Scrollable View -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        
+        <!-- Live Relational Telemetry Ticker -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div class="text-xs font-mono">
+              <span class="text-emerald-500 font-bold">LIVE TELEMETRY:</span>
+              <span class="text-[var(--text-muted)] ml-1">Automated Root Cause Correlation Active</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-mono text-[var(--text-metadata)]">
+            <span id="ticker-time">Sync: Active</span>
+            <span class="hidden md:inline">•</span>
+            <span class="hidden md:inline">PostgreSQL RLS Enforced</span>
+          </div>
+        </div>
+
+        <!-- 4 Primary Metric KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 1. Enterprise Health Index -->
+          <div class="spotlight-card p-5 rounded-3xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-[var(--text-metadata)] uppercase tracking-wider font-semibold">Enterprise Health</span>
+              <span id="kpi-health-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                ATTENTION
+              </span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <div id="kpi-health-val" class="text-3xl font-bold font-mono text-[var(--text-primary)]">--</div>
+              <span class="text-xs text-[var(--text-muted)]">/ 100 Index</span>
+            </div>
+            <p class="text-[11px] text-[var(--text-muted)]">Weighted penalty on critical supply bottlenecks</p>
+          </div>
+
+          <!-- 2. Critical Exposures -->
+          <div class="spotlight-card p-5 rounded-3xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-[var(--text-metadata)] uppercase tracking-wider font-semibold">Critical Incidents</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                BLOCKER
+              </span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <div id="kpi-crit-val" class="text-3xl font-bold font-mono text-rose-500">--</div>
+              <span class="text-xs text-[var(--text-muted)]">Active</span>
+            </div>
+            <p class="text-[11px] text-[var(--text-muted)]">Pune MCU stockout triggering assembly risk</p>
+          </div>
+
+          <!-- 3. Revenue At Immediate Risk -->
+          <div class="spotlight-card p-5 rounded-3xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-[var(--text-metadata)] uppercase tracking-wider font-semibold">Revenue At Risk</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                EXPOSURE
+              </span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <div id="kpi-rev-val" class="text-3xl font-bold font-mono text-[var(--text-primary)]">₹8.4L</div>
+              <span id="kpi-orders-val" class="text-xs text-[var(--text-muted)]">243 Orders</span>
+            </div>
+            <p class="text-[11px] text-[var(--text-muted)]">Delayed freight delivery on PO #8942</p>
+          </div>
+
+          <!-- 4. Inventory Health -->
+          <div class="spotlight-card p-5 rounded-3xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-[var(--text-metadata)] uppercase tracking-wider font-semibold">Inventory Buffer</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                4 HUBS
+              </span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <div id="kpi-inv-val" class="text-3xl font-bold font-mono text-[var(--text-primary)]">--</div>
+              <span class="text-xs text-[var(--text-muted)]">Optimal Buffer</span>
+            </div>
+            <p class="text-[11px] text-[var(--text-muted)]">Mumbai Depot maintains 1,850 unit surplus</p>
+          </div>
+        </div>
+
+        <!-- Relational Supply Chain Disruption Impact Banner -->
+        <div id="disruption-banner" class="spotlight-card p-6 sm:p-7 rounded-3xl border-rose-500/40 bg-gradient-to-r from-rose-950/20 via-[var(--bg-surface)] to-[var(--bg-surface)] space-y-5">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-3 py-1 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold uppercase animate-pulse">
+                  CRITICAL SUPPLY CHAIN BLOCKER
+                </span>
+                <span class="text-xs font-mono text-rose-400 font-bold">INC-2026-8942</span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold text-[var(--text-primary)] font-editorial tracking-tight">
+                Pune MCU Stockout: DHL Flight Connection Delay (+48h)
+              </h2>
+              <p class="text-xs text-[var(--text-muted)] mt-1 max-w-2xl">
+                Frankfurt customs clearance delay on PO #8942 reduced Pune facility stock to 42 units (threshold: 400). 243 committed customer shipments are blocked with ₹8.4L revenue at immediate SLA risk.
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+              <button
+                onclick="openIncidentModal('inc-pune-critical-01')"
+                class="px-4 py-2.5 rounded-2xl bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] font-bold text-xs border border-[var(--border-hairline)] flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <i data-lucide="network" class="w-4 h-4 text-amber-500"></i>
+                <span>View Dependency Graph</span>
+              </button>
+
+              <button
+                onclick="openStockTransferModal('prod-tx9-mcu', 'wh-pune-01')"
+                class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-neutral-950 font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                <span>Dispatch Mumbai Buffer Stock (300 Units)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Main Dashboard Columns: Incidents & Logistics Facilities -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Column 1: Live Operational Incidents Feed -->
+          <div class="spotlight-card p-6 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
+              <div>
+                <h3 class="text-sm font-bold text-[var(--text-primary)] font-editorial">Operational Incidents Queue</h3>
+                <p class="text-[11px] text-[var(--text-muted)]">Live root-cause telemetry from assembly hubs</p>
+              </div>
+              <a href="incidents.html" class="text-xs text-amber-500 hover:text-amber-400 font-semibold flex items-center gap-1">
+                <span>View Command Center</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+
+            <div id="dashboard-incidents-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Column 2: Facility Capacities & Stock Balances -->
+          <div class="spotlight-card p-6 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
+              <div>
+                <h3 class="text-sm font-bold text-[var(--text-primary)] font-editorial">Facility Hub Occupancy</h3>
+                <p class="text-[11px] text-[var(--text-muted)]">Logistics capacity & buffer thresholds</p>
+              </div>
+              <a href="inventory.html" class="text-xs text-amber-500 hover:text-amber-400 font-semibold flex items-center gap-1">
+                <span>Manage Inventory</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+
+            <div id="dashboard-warehouses-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="public/js/seed.js"></script>
+  <script src="public/js/store.js"></script>
+  <script src="public/js/components.js"></script>
+  <script>
+    function renderDashboard() {
+      renderSharedLayout('dashboard');
+
+      const metrics = window.store.getMetrics();
+      const incidents = window.store.getIncidents();
+      const warehouses = window.store.getWarehouses();
+
+      // Update KPIs
+      document.getElementById('kpi-health-val').textContent = metrics.enterprise_health + '%';
+      document.getElementById('kpi-crit-val').textContent = metrics.critical_incidents;
+      document.getElementById('kpi-rev-val').textContent = '₹' + (metrics.revenue_at_risk / 100000).toFixed(1) + 'L';
+      document.getElementById('kpi-orders-val').textContent = metrics.affected_orders + ' Orders';
+      document.getElementById('kpi-inv-val').textContent = metrics.inventory_health + '%';
+
+      // Update Disruption Banner
+      const puneCrit = incidents.find(i => i.id === 'inc-pune-critical-01');
+      const disruptionBanner = document.getElementById('disruption-banner');
+      if (puneCrit && puneCrit.status === 'RESOLVED') {
+        disruptionBanner.className = 'spotlight-card p-6 rounded-3xl border-emerald-500/40 bg-emerald-500/5 space-y-3';
+        disruptionBanner.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-emerald-500">Supply Bottleneck Resolved</h3>
+                <p class="text-xs text-[var(--text-muted)]">300 Units of TX-9 MCU dispatched via Expressway transit. Pune assembly line restored.</p>
+              </div>
+            </div>
+            <button onclick="window.store.triggerSupplierDelaySimulation(); renderDashboard();" class="px-4 py-2 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer">
+              Re-simulate Disruption
+            </button>
+          </div>
+        `;
+      }
+
+      // Render Incidents List
+      const incList = document.getElementById('dashboard-incidents-list');
+      incList.innerHTML = incidents.map(inc => {
+        const isCrit = inc.priority === 'CRITICAL';
+        const isResolved = inc.status === 'RESOLVED';
+        return `
+          <div onclick="openIncidentModal('${inc.id}')" class="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] hover:bg-amber-500/10 border border-[var(--border-hairline)] hover:border-amber-500/30 transition-all cursor-pointer flex items-center justify-between">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${isCrit ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400'}">${inc.priority}</span>
+                <span class="text-[11px] font-mono text-[var(--text-metadata)]">${inc.incident_number}</span>
+                <span class="text-[10px] font-mono uppercase text-[var(--text-metadata)]">${inc.status}</span>
+              </div>
+              <div class="text-xs font-bold text-[var(--text-primary)]">${inc.title}</div>
+            </div>
+            <div class="text-right font-mono">
+              <div class="text-xs font-bold ${isCrit ? 'text-rose-500' : 'text-[var(--text-primary)]'}">₹${(inc.revenue_impact / 100000).toFixed(1)}L</div>
+              <div class="text-[10px] text-[var(--text-muted)]">${inc.affected_orders} Orders</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Warehouses List
+      const whList = document.getElementById('dashboard-warehouses-list');
+      whList.innerHTML = warehouses.map(wh => {
+        const pct = Math.min(100, Math.round((wh.current_capacity / wh.max_capacity) * 100));
+        return `
+          <div class="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-[var(--text-primary)]">${wh.name}</span>
+              <span class="font-mono text-[var(--text-muted)]">${wh.current_capacity.toLocaleString()} / ${wh.max_capacity.toLocaleString()} Units</span>
+            </div>
+            <div class="w-full h-2 bg-[var(--bg-surface)] rounded-full overflow-hidden">
+              <div class="h-full rounded-full ${pct > 90 ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${pct}%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] font-mono text-[var(--text-metadata)]">
+              <span>Code: ${wh.code}</span>
+              <span>${pct}% Capacity Utilization</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('ticker-time').textContent = 'Sync: ' + new Date().toLocaleTimeString();
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      window.store.subscribe(() => renderDashboard());
+    });
+  </script>
+</body>
+</html>
