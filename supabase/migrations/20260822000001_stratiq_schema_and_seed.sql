@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 2. Organizations
 CREATE TABLE IF NOT EXISTS public.organizations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEF AULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     industry VARCHAR(100) NOT NULL,
     logo_url TEXT,

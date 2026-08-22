@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Critical Incidents', 
       icon: AlertOctagon,
       badge: criticalIncidents > 0 ? criticalIncidents : undefined,
-      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+      badgeColor: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30',
     },
     { id: 'inventory', label: 'Inventory & Hubs', icon: Boxes },
     { id: 'procurement', label: 'Procurement & POs', icon: Truck },
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Approvals & Actions', 
       icon: CheckSquare,
       badge: pendingApprovals > 0 ? pendingApprovals : undefined,
-      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+      badgeColor: 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30',
     },
     { id: 'workforce', label: 'Workforce & Shifts', icon: Users },
     { id: 'reports', label: 'Executive Reports', icon: BarChart3 },
@@ -66,18 +66,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="w-full lg:w-64 flex-shrink-0">
-      <div className="glass-panel rounded-2xl p-3 border border-white/10 lg:sticky lg:top-20 space-y-4">
+      <div className="bg-[var(--bg-surface)] rounded-3xl p-3.5 border border-[var(--border-hairline)] lg:sticky lg:top-20 space-y-4 shadow-sm transition-colors duration-200">
         
         {/* Organization Scope Header */}
-        <div className="px-3 py-2 rounded-xl bg-neutral-900/60 border border-white/5">
-          <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
+        <div className="px-3.5 py-2.5 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)]">
+          <div className="text-[10px] font-mono text-[var(--text-metadata)] uppercase tracking-widest font-semibold">
             Active Workspace
           </div>
-          <div className="text-xs font-semibold text-neutral-200 truncate mt-0.5">
+          <div className="text-xs font-bold text-[var(--text-primary)] truncate mt-0.5">
             Apex Semiconductor Ltd.
           </div>
-          <div className="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-400 font-mono">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          <div className="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Realtime Synchronized</span>
           </div>
         </div>
@@ -91,21 +91,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all group cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500/15 text-amber-200 border border-amber-500/40 shadow-lg shadow-amber-950/30'
-                    : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/80 border border-transparent'
+                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 font-semibold shadow-sm'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border border-transparent'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={`h-4 w-4 transition-colors ${
-                    isActive ? 'text-amber-400' : 'text-neutral-500 group-hover:text-neutral-300'
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Icon className={`h-4 w-4 transition-colors shrink-0 ${
+                    isActive ? 'text-emerald-500' : 'text-[var(--text-metadata)] group-hover:text-[var(--text-primary)]'
                   }`} />
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </div>
 
                 {item.badge !== undefined && (
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border ${item.badgeColor}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border shrink-0 ${item.badgeColor}`}>
                     {item.badge}
                   </span>
                 )}
@@ -115,34 +115,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Quick Operational Action: Emergency Transfer */}
-        <div className="pt-2 border-t border-white/10">
+        <div className="pt-2 border-t border-[var(--border-hairline)]">
           <button
             onClick={onOpenTransferModal}
-            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-900/30 to-amber-950/40 hover:from-amber-900/50 hover:to-amber-950/60 border border-amber-500/30 text-amber-200 text-xs font-semibold transition-all group"
+            className="w-full flex items-center justify-between p-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-all group cursor-pointer shadow-sm"
           >
-            <div className="flex items-center gap-2">
-              <ArrowLeftRight className="h-3.5 w-3.5 text-amber-400" />
-              <span>Stock Transfer Dispatch</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <ArrowLeftRight className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              <span className="truncate">Stock Transfer Dispatch</span>
             </div>
-            <ChevronRight className="h-3.5 w-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="h-3.5 w-3.5 text-emerald-500 group-hover:translate-x-0.5 transition-transform shrink-0" />
           </button>
         </div>
 
         {/* Health Telemetry Mini Card */}
-        <div className="p-3 rounded-xl bg-neutral-900/80 border border-white/5 space-y-2">
+        <div className="p-3.5 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-2.5">
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-neutral-400">Inventory Health</span>
-            <span className="font-mono text-neutral-200 font-bold">{metrics.inventory_health}%</span>
+            <span className="text-[var(--text-muted)]">Inventory Health</span>
+            <span className="font-mono text-[var(--text-primary)] font-bold">{metrics.inventory_health}%</span>
           </div>
-          <div className="w-full h-1.5 rounded-full bg-neutral-800 overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500"
               style={{ width: `${metrics.inventory_health}%` }}
             />
           </div>
-          <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
-            <span>Workforce Availability</span>
-            <span className="font-mono text-emerald-400">{metrics.workforce_availability}%</span>
+          <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] pt-0.5">
+            <span>Workforce Active</span>
+            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{metrics.workforce_availability}%</span>
           </div>
         </div>
 

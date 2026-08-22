@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { RealtimeProvider } from './context/RealtimeContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar, TabType } from './components/layout/Sidebar';
 import { ExecutiveDashboard } from './components/dashboard/ExecutiveDashboard';
@@ -23,9 +24,30 @@ function MainApp() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Dynamic radial spotlight tracking on pointer move
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const cards = document.querySelectorAll('.spotlight-card');
+      cards.forEach(card => {
+        const rect = (card as HTMLElement).getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
+        (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
+    <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-300 relative transition-colors duration-200">
       
+      {/* Ambient Blurred Mesh Background Glow Orbs */}
+      <div className="ambient-glow-emerald" aria-hidden="true" />
+      <div className="ambient-glow-violet" aria-hidden="true" />
+
       {/* Top Glassmorphic Command Navbar */}
       <Navbar
         onOpenSearch={() => setIsSearchOpen(true)}
@@ -34,7 +56,7 @@ function MainApp() {
       />
 
       {/* Main App Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6 relative z-10">
         
         {/* Left Navigation Sidebar */}
         <Sidebar
@@ -121,11 +143,13 @@ function MainApp() {
 
 export function App() {
   return (
-    <AuthProvider>
-      <RealtimeProvider>
-        <MainApp />
-      </RealtimeProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RealtimeProvider>
+          <MainApp />
+        </RealtimeProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

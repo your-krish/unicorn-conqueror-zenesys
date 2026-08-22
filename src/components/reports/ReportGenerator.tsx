@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  BarChart3, Download, FileText, Calendar, Filter, 
-  CheckCircle2, Printer, ArrowDownToLine 
+  Download, CheckCircle2 
 } from 'lucide-react';
 import { useRealtime } from '../../context/RealtimeContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const ReportGenerator: React.FC = () => {
-  const { metrics, incidents, inventory } = useRealtime();
+  const { metrics } = useRealtime();
   const { user } = useAuth();
   const [reportType, setReportType] = useState<'EXECUTIVE' | 'INCIDENT' | 'INVENTORY'>('EXECUTIVE');
   const [isExported, setIsExported] = useState(false);
@@ -38,16 +37,16 @@ export const ReportGenerator: React.FC = () => {
     <div className="space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[var(--border-hairline)]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-amber-400 uppercase tracking-wider font-semibold">
+            <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-bold">
               Deterministic Database Aggregations
             </span>
-            <span className="h-1 w-1 rounded-full bg-neutral-600"></span>
-            <span className="text-[11px] text-neutral-400">PostgreSQL Reports Table</span>
+            <span className="h-1 w-1 rounded-full bg-neutral-400 dark:bg-neutral-600"></span>
+            <span className="text-[11px] text-[var(--text-metadata)]">PostgreSQL Reports Table</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white mt-1 font-editorial">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] mt-1 font-editorial">
             Executive Operations Reports
           </h1>
         </div>
@@ -55,7 +54,7 @@ export const ReportGenerator: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs transition-all shadow-lg shadow-amber-500/20"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-neutral-950 font-bold text-xs transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
           >
             <Download className="h-3.5 w-3.5" />
             <span>{isExported ? 'Report Downloaded!' : 'Export CSV / Data'}</span>
@@ -64,7 +63,7 @@ export const ReportGenerator: React.FC = () => {
       </div>
 
       {/* Report Type Selector */}
-      <div className="flex items-center gap-2 border-b border-white/10 text-xs">
+      <div className="flex items-center gap-2 border-b border-[var(--border-hairline)] text-xs">
         {[
           { id: 'EXECUTIVE', label: 'Executive Command Summary' },
           { id: 'INCIDENT', label: 'Incident & SLA Post-Mortem' },
@@ -73,10 +72,10 @@ export const ReportGenerator: React.FC = () => {
           <button
             key={r.id}
             onClick={() => setReportType(r.id as any)}
-            className={`px-4 py-2 border-b-2 transition-all font-medium ${
+            className={`px-4 py-2.5 border-b-2 transition-all font-semibold cursor-pointer ${
               reportType === r.id
-                ? 'border-amber-400 text-amber-300 font-bold'
-                : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
+                : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}
           >
             {r.label}
@@ -85,53 +84,53 @@ export const ReportGenerator: React.FC = () => {
       </div>
 
       {/* Report Document Sheet (Clean, Editorial, High-Contrast) */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/15 bg-neutral-900/90 space-y-6 max-w-4xl mx-auto shadow-2xl">
+      <div className="spotlight-card p-6 sm:p-8 rounded-3xl space-y-6 max-w-4xl mx-auto shadow-xl">
         
         {/* Document Header */}
-        <div className="flex justify-between items-start pb-6 border-b border-white/10">
+        <div className="flex justify-between items-start pb-6 border-b border-[var(--border-hairline)]">
           <div>
-            <div className="text-[10px] font-mono uppercase text-amber-400 tracking-widest">
+            <div className="text-[10px] font-mono uppercase text-emerald-600 dark:text-emerald-400 tracking-widest font-bold">
               STRATIQ ENTERPRISE REPORT • CONFIDENTIAL
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white mt-1 font-editorial">
+            <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-1 font-editorial">
               {reportType === 'EXECUTIVE' && 'Operational Health & Financial Risk Summary'}
               {reportType === 'INCIDENT' && 'Supply Chain Blocker & SLA Root Cause Audit'}
               {reportType === 'INVENTORY' && 'Multi-Facility Inventory & Buffer Variance'}
             </h2>
-            <div className="text-xs text-neutral-400 mt-1">
-              Generated by: <strong>{user?.full_name}</strong> • Scope: Apex Semiconductor Ltd.
+            <div className="text-xs text-[var(--text-muted)] mt-1">
+              Generated by: <strong className="text-[var(--text-primary)]">{user?.full_name}</strong> • Scope: Apex Semiconductor Ltd.
             </div>
           </div>
-          <div className="text-right text-xs font-mono text-neutral-400">
+          <div className="text-right text-xs font-mono text-[var(--text-metadata)]">
             <div>Date: {new Date().toLocaleDateString()}</div>
-            <div>Status: VERIFIED</div>
+            <div className="text-emerald-600 dark:text-emerald-400 font-bold">Status: VERIFIED</div>
           </div>
         </div>
 
         {/* Executive Highlights Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-neutral-950/70 border border-white/10 space-y-1">
-            <span className="text-[10px] font-mono uppercase text-neutral-400">Enterprise Health Index</span>
-            <div className="text-2xl font-bold font-mono text-emerald-400">{metrics.enterprise_health}%</div>
-            <span className="text-[10px] text-neutral-400">Formula weight applied</span>
+          <div className="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[var(--text-metadata)]">Enterprise Health Index</span>
+            <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{metrics.enterprise_health}%</div>
+            <span className="text-[10px] text-[var(--text-muted)]">Formula weight applied</span>
           </div>
 
-          <div className="p-4 rounded-xl bg-neutral-950/70 border border-white/10 space-y-1">
-            <span className="text-[10px] font-mono uppercase text-neutral-400">Active Critical Exposures</span>
-            <div className="text-2xl font-bold font-mono text-rose-400">{metrics.critical_incidents} Incidents</div>
-            <span className="text-[10px] text-neutral-400">Pune Warehouse deficit</span>
+          <div className="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[var(--text-metadata)]">Active Critical Exposures</span>
+            <div className="text-2xl font-bold font-mono text-rose-500">{metrics.critical_incidents} Incidents</div>
+            <span className="text-[10px] text-[var(--text-muted)]">Pune Warehouse deficit</span>
           </div>
 
-          <div className="p-4 rounded-xl bg-neutral-950/70 border border-white/10 space-y-1">
-            <span className="text-[10px] font-mono uppercase text-neutral-400">Revenue Risk Factor</span>
-            <div className="text-2xl font-bold font-mono text-white">₹8.4L</div>
-            <span className="text-[10px] text-neutral-400">243 committed orders</span>
+          <div className="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[var(--text-metadata)]">Revenue Risk Factor</span>
+            <div className="text-2xl font-bold font-mono text-[var(--text-primary)]">₹8.4L</div>
+            <span className="text-[10px] text-[var(--text-muted)]">243 committed orders</span>
           </div>
         </div>
 
         {/* Section Body */}
-        <div className="space-y-3 text-xs text-neutral-300 leading-relaxed">
-          <h4 className="font-bold text-white uppercase font-mono tracking-wider text-xs">
+        <div className="space-y-3 text-xs text-[var(--text-muted)] leading-relaxed">
+          <h4 className="font-bold text-[var(--text-primary)] uppercase font-mono tracking-wider text-xs">
             1. Tactical Findings & Root Cause
           </h4>
           <p>
@@ -143,10 +142,10 @@ export const ReportGenerator: React.FC = () => {
         </div>
 
         {/* Signature & Verification Block */}
-        <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-neutral-400">
+        <div className="pt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs text-[var(--text-metadata)]">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Database Integrity & RLS Signoff Confirmed</span>
+            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <span className="text-[var(--text-muted)] font-medium">Database Integrity & RLS Signoff Confirmed</span>
           </div>
           <div className="font-mono text-[10px]">
             SHA-256: 8f9b...3c12
